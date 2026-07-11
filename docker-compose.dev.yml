@@ -1,0 +1,65 @@
+# Infrastructure only — use with local backend/frontend (recommended for development)
+#
+#   docker compose -f docker-compose.dev.yml up -d
+#   cd backend && alembic upgrade head && uvicorn app.main:app --reload
+#   cd frontend && npm run dev
+#
+# Postgres is exposed on host port 5433 (avoids conflict with Homebrew Postgres on 5432).
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: nexusai-postgres
+    environment:
+      POSTGRES_USER: nexusai
+      POSTGRES_PASSWORD: nexusai_dev
+      POSTGRES_DB: nexusai
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nexusai -d nexusai"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  redis:
+    image: redis:7-alpine
+    container_name: nexusai-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  chromadb:
+    image: chromadb/chroma:0.5.23
+    container_name: nexusai-chromadb
+    ports:
+      - "8001:8000"
+    volumes:
+      - chroma_data:/chroma/chroma
+    environment:
+      ANONYMIZED_TELEMETRY: "false"
+      IS_PERSISTENT: "TRUE"
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/v1/heartbeat', timeout=3)\"",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
+
+volumes:
+  postgres_data:
+  redis_data:
+  chroma_data:

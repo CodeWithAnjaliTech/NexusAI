@@ -1,0 +1,36 @@
+services:
+  - type: web
+    name: nexusai-backend
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    plan: starter
+    healthCheckPath: /health
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: nexusai-db
+          property: connectionString
+      - key: REDIS_URL
+        sync: false
+      - key: CHROMA_HOST
+        sync: false
+      - key: CHROMA_PORT
+        value: "8000"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: OLLAMA_BASE_URL
+        sync: false
+      - key: LANGCHAIN_TRACING_V2
+        value: "true"
+      - key: LANGCHAIN_API_KEY
+        sync: false
+      - key: SANDBOX_USE_DOCKER
+        value: "true"
+      - key: CORS_ORIGINS
+        value: '["https://your-app.vercel.app"]'
+
+databases:
+  - name: nexusai-db
+    plan: starter
+    postgresMajorVersion: "16"
