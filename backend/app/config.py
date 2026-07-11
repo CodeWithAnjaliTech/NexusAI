@@ -3,7 +3,7 @@
 from functools import lru_cache
 from typing import List
 
-from pydantic import Field
+from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -82,6 +82,24 @@ class Settings(BaseSettings):
     code_review_max_files: int = 80
     code_review_max_file_chars: int = 4000
     code_review_max_context_chars: int = 28000
+
+    @field_validator("database_url", mode="before")
+    @classmethod
+    def normalize_database_url(cls, value: str) -> str:
+        """Accept common Postgres URL formats (Neon, local, accidental double prefix)."""
+        if not isinstance(value, str):
+            return value
+
+        url = value.strip()
+        if url.startswith("DATABASE_URL="):
+            url = url.removeprefix("DATABASE_URL=").strip()
+
+        if url.startswith("postgresql://"):
+            url = url.replace("postgresql://", "postgresql+asyncpg://", 1)
+        elif url.startswith("postgres://"):
+            url = url.replace("postgres://", "postgresql+asyncpg://", 1)
+
+        return url
 
     @property
     def chroma_url(self) -> str:

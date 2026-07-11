@@ -1,0 +1,31 @@
+# Python
+venv/
+.venv/
+__pycache__/
+*.pyc
+
+# Environment
+.env
+.env.local
+.env.docker
+
+# Git
+.git
+.github
+
+# Cache
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Uploads
+uploads/
+
+# Logs
+logs/
+
+# IDE
+.vscode/
+.idea/
+
+.DS_Store
