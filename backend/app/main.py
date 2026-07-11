@@ -130,7 +130,10 @@ app.include_router(workflows.router, prefix=api_prefix)
 
 @app.get("/health")
 async def health():
-    return {"status": "healthy", "app": settings.app_name, "version": "0.5.0"}
+    return {
+        "status": "healthy",
+        "service": "NexusAI API"
+    }
 
 
 @app.get(f"{api_prefix}/health/status")
