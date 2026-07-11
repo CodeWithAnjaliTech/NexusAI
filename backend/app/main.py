@@ -188,8 +188,8 @@ async def health_status(db: AsyncSession = Depends(get_db)):
         hints["docker"] = "Code Playground needs Docker Desktop running"
 
     checks["backend"] = "ok"
-    required = {"database", "ollama", "backend"}
-    optional = {"chromadb", "redis", "docker"}
+    required = {"database", "backend"}
+    optional = {"chromadb", "redis", "docker", "ollama"}
     overall = "healthy"
     if any(checks.get(name) != "ok" for name in required):
         overall = "degraded"
@@ -211,7 +211,7 @@ async def root():
         "status": "running",
         "version": "1.0.0"
     }
-    
+
 @app.websocket("/ws/chat/{session_id}")
 async def websocket_chat(
     websocket: WebSocket,
