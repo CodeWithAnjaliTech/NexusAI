@@ -204,7 +204,14 @@ async def health_status(db: AsyncSession = Depends(get_db)):
         "optional_services": sorted(optional),
     }
 
-
+@app.get("/")
+async def root():
+    return {
+        "name": "NexusAI API",
+        "status": "running",
+        "version": "1.0.0"
+    }
+    
 @app.websocket("/ws/chat/{session_id}")
 async def websocket_chat(
     websocket: WebSocket,
