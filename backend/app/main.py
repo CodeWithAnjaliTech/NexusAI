@@ -132,7 +132,9 @@ app.include_router(workflows.router, prefix=api_prefix)
 async def health():
     return {
         "status": "healthy",
-        "service": "NexusAI API"
+        "service": "NexusAI API",
+        "app": settings.app_name,
+        "version": app.version,
     }
 
 
