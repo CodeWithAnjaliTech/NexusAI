@@ -12,14 +12,18 @@ settings = get_settings()
 
 def _asyncpg_connect_args(database_url: str) -> dict:
     """Build asyncpg connect_args; Neon/cloud Postgres requires SSL."""
-    connect_args: dict = {"timeout": 5}
+    connect_args: dict = {"timeout": 15}
     parsed = urlparse(database_url)
     query = parse_qs(parsed.query)
 
     ssl_mode = (query.get("ssl") or query.get("sslmode") or [None])[0]
     if ssl_mode in ("require", "verify-full", "verify-ca", "true", "1"):
         connect_args["ssl"] = True
-    elif parsed.hostname and parsed.hostname.endswith(".neon.tech"):
+    elif parsed.hostname and (
+        parsed.hostname.endswith(".neon.tech")
+        or parsed.hostname.endswith(".render.com")
+        or parsed.hostname.startswith("dpg-")
+    ):
         connect_args["ssl"] = True
 
     return connect_args

@@ -58,6 +58,15 @@ async def lifespan(app: FastAPI):
     configure_tracing()
     logger.info("Starting %s [%s]", settings.app_name, settings.app_env)
 
+    db_target = settings.database_url.split("@")[-1]
+    if settings.app_env == "production" and (
+        "localhost" in settings.database_url or "127.0.0.1" in settings.database_url
+    ):
+        raise RuntimeError(
+            "DATABASE_URL is not configured for production. "
+            "Set your Neon or Render Postgres connection string in Render → Environment."
+        )
+
     from app.db.session import AsyncSessionLocal
 
     try:
@@ -66,17 +75,17 @@ async def lifespan(app: FastAPI):
             await seed_agents(db)
             await get_or_create_default_user(db)
             await db.commit()
-    except (TimeoutError, OSError, ConnectionRefusedError) as exc:
-        logger.error(
-            "Database unavailable at %s — start dependencies first:\n"
-            "  cd .. && docker compose up -d postgres redis chromadb\n"
-            "  cd backend && alembic upgrade head",
-            settings.database_url.split("@")[-1],
-        )
+    except Exception as exc:
+        logger.error("Database unavailable at %s: %s", db_target, exc)
+        if settings.app_env == "production":
+            raise RuntimeError(
+                f"Cannot connect to PostgreSQL ({db_target}). "
+                "Verify DATABASE_URL on Render points to your Neon database "
+                "and includes ?sslmode=require for Neon."
+            ) from exc
         raise RuntimeError(
-            "PostgreSQL is not running. Start Docker services with "
-            "'docker compose up -d postgres redis chromadb' from the project root, "
-            "then run 'alembic upgrade head' in backend/."
+            "PostgreSQL is not running. For local dev: "
+            "./scripts/setup-local.sh or docker compose up -d postgres"
         ) from exc
 
     if settings.sandbox_use_docker and settings.sandbox_prewarm_on_startup:
