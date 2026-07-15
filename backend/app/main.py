@@ -178,7 +178,7 @@ async def health_status(db: AsyncSession = Depends(get_db)):
         checks["ollama"] = "ok" if response.status_code == 200 else "unavailable"
     except Exception:
         checks["ollama"] = "unavailable"
-        hints["ollama"] = "Chat requires Ollama: ollama serve && ollama pull llama3.2"
+        hints["ollama"] = "Local chat uses Ollama. On Render set LLM_PROVIDER=groq or openai with an API key."
 
     try:
         proc = subprocess.run(

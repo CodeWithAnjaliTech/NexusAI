@@ -16,7 +16,7 @@ router = APIRouter(prefix="/config", tags=["config"])
 
 
 class LlmPreferenceUpdate(BaseModel):
-    provider: Literal["ollama", "openai", "anthropic"] | None = None
+    provider: Literal["ollama", "openai", "anthropic", "groq"] | None = None
     model: str | None = Field(default=None, max_length=128)
 
 

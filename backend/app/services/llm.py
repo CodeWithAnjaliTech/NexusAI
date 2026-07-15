@@ -1,4 +1,4 @@
-"""LLM service — supports Ollama, OpenAI, and Anthropic."""
+"""LLM service — supports Ollama, OpenAI, Anthropic, and Groq."""
 
 from functools import lru_cache
 
@@ -28,6 +28,7 @@ class LLMService:
             model_override if provider == "anthropic" and model_override else self._settings.anthropic_model
         )
         ollama_model = model_override if provider == "ollama" and model_override else self._settings.ollama_model
+        groq_model = model_override if provider == "groq" and model_override else self._settings.groq_model
 
         if provider == "openai" and self._settings.openai_api_key:
             try:
@@ -52,6 +53,18 @@ class LLMService:
                 )
             except ImportError:
                 logger.warning("langchain-anthropic not installed, falling back to Ollama")
+
+        if provider == "groq" and self._settings.groq_api_key:
+            try:
+                from langchain_groq import ChatGroq
+
+                return ChatGroq(
+                    api_key=self._settings.groq_api_key,
+                    model=groq_model,
+                    temperature=temperature,
+                )
+            except ImportError:
+                logger.warning("langchain-groq not installed, falling back to Ollama")
 
         return ChatOllama(
             base_url=self._settings.ollama_base_url,
@@ -94,6 +107,8 @@ class LLMService:
                 if effective_provider == "openai" and self._settings.openai_api_key
                 else self._settings.anthropic_model
                 if effective_provider == "anthropic" and self._settings.anthropic_api_key
+                else self._settings.groq_model
+                if effective_provider == "groq" and self._settings.groq_api_key
                 else self._settings.ollama_model
             )
         )
@@ -111,11 +126,14 @@ class LLMService:
             if self._settings.anthropic_api_key
             else None,
             "anthropic_configured": bool(self._settings.anthropic_api_key),
+            "groq_model": self._settings.groq_model if self._settings.groq_api_key else None,
+            "groq_configured": bool(self._settings.groq_api_key),
             "active_model": active_model,
             "available_providers": [
                 p
                 for p, ok in (
                     ("ollama", True),
+                    ("groq", bool(self._settings.groq_api_key)),
                     ("openai", bool(self._settings.openai_api_key)),
                     ("anthropic", bool(self._settings.anthropic_api_key)),
                 )

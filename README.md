@@ -70,7 +70,8 @@ docker compose up -d
 
 ```env
 SANDBOX_USE_DOCKER=true
-LLM_PROVIDER=ollama          # ollama | openai | anthropic
+LLM_PROVIDER=ollama          # ollama | groq | openai | anthropic
+GROQ_API_KEY=                # free tier: https://console.groq.com
 OPENAI_API_KEY=
 ANTHROPIC_API_KEY=
 SANDBOX_MAX_CONCURRENT=5
@@ -128,5 +129,6 @@ User → Chat UI → POST /chat/stream → LangGraph Supervisor
 
 ## Deploy
 
-- Frontend → Vercel (`frontend/vercel.json`)
-- Backend → Render (`render.yaml`) — requires Docker for sandbox
+- Frontend → Vercel (`frontend/vercel.json`) — https://nexus-ai-rouge-five.vercel.app
+- Backend → Render (`render.yaml`) — https://nexusai-backend-7tgy.onrender.com
+- Production LLM → set `LLM_PROVIDER=groq` and `GROQ_API_KEY` on Render (free tier at [console.groq.com](https://console.groq.com))

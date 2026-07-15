@@ -36,6 +36,8 @@ interface LlmConfig {
 	openai_configured: boolean;
 	anthropic_model: string | null;
 	anthropic_configured: boolean;
+	groq_model: string | null;
+	groq_configured: boolean;
 	available_providers?: string[];
 }
 
@@ -348,7 +350,9 @@ export function SettingsPage() {
 											: (selectedProvider || llmConfig?.provider) ===
 												  "anthropic"
 												? llmConfig?.anthropic_model || "claude-3-5-haiku"
-												: llmConfig?.ollama_model || "llama3.2"
+												: (selectedProvider || llmConfig?.provider) === "groq"
+													? llmConfig?.groq_model || "llama-3.3-70b-versatile"
+													: llmConfig?.ollama_model || "llama3.2"
 									}
 									value={selectedModel || llmConfig?.user_model || ""}
 									onChange={(e) => setSelectedModel(e.target.value)}
@@ -374,7 +378,7 @@ export function SettingsPage() {
 							{llmMutation.isPending ? "Saving…" : "Save preferences"}
 						</Button>
 					</div>
-					<div className="grid gap-1 px-4 py-3 text-xs text-muted-foreground sm:grid-cols-2 lg:grid-cols-4">
+					<div className="grid gap-1 px-4 py-3 text-xs text-muted-foreground sm:grid-cols-2 lg:grid-cols-5">
 						<p>
 							<span className="text-foreground">Server default:</span>{" "}
 							{llmConfig?.default_provider || llmConfig?.provider || "—"}
@@ -382,6 +386,12 @@ export function SettingsPage() {
 						<p>
 							<span className="text-foreground">Ollama:</span>{" "}
 							{llmConfig?.ollama_model} @ {llmConfig?.ollama_base_url}
+						</p>
+						<p>
+							<span className="text-foreground">Groq:</span>{" "}
+							{llmConfig?.groq_configured
+								? llmConfig.groq_model
+								: "not configured"}
 						</p>
 						<p>
 							<span className="text-foreground">OpenAI:</span>{" "}

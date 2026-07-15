@@ -62,11 +62,13 @@ class Settings(BaseSettings):
     sandbox_container_start_seconds: int = 20
 
     # LLM providers
-    llm_provider: str = "ollama"  # ollama | openai | anthropic
+    llm_provider: str = "ollama"  # ollama | openai | anthropic | groq
     openai_api_key: str = ""
     openai_model: str = "gpt-4o-mini"
     anthropic_api_key: str = ""
     anthropic_model: str = "claude-3-5-haiku-20241022"
+    groq_api_key: str = ""
+    groq_model: str = "llama-3.3-70b-versatile"
 
     # Phase 3: RAG
     rag_rerank_enabled: bool = True

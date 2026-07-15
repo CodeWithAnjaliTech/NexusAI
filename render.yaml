@@ -31,6 +31,10 @@ services:
         value: "false"
       - key: LLM_PROVIDER
         sync: false
+      - key: GROQ_API_KEY
+        sync: false
+      - key: GROQ_MODEL
+        value: "llama-3.3-70b-versatile"
       - key: OPENAI_API_KEY
         sync: false
       - key: ANTHROPIC_API_KEY
@@ -40,7 +44,7 @@ services:
       - key: DEBUG
         value: "false"
       - key: CORS_ORIGINS
-        value: '["http://localhost:5173","https://your-app.vercel.app"]'
+        value: '["http://localhost:5173","https://nexus-ai-rouge-five.vercel.app"]'
 
 databases:
   - name: nexusai-db
